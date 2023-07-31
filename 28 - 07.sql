@@ -30,7 +30,8 @@ WHERE
 --    AND PC."Id" = '707c6484-dacd-43c9-adea-7d3045e32843'
     AND (LC."Vencimento" >= (('2023/06/01')::timestamptz) AND LC."Vencimento" <= (('2023/06/30')::timestamptz))
     AND LC."TipoDoLancamento_Id" = 'despesa'
-group by PCI."Nome";
+GROUP BY
+    PCI."Nome";
 
 
 -- Por plano de contas de receita
