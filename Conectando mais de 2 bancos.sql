@@ -45,3 +45,16 @@ FROM
             LEFT JOIN financeiro.lancamentos."Lancamentos" AS LC ON OP."Id" = LC."OrdemDePagamento_Id"')
             AS OPELC ("LcId" uuid, "OpId" uuid, "OsId" uuid)
                 ON OS."Id" = OPELC."OsId";
+
+-- select * from erprastreamento.ordemdeservicoagendamentos."Agendamentos"
+-- select * from erprastreamento.ordemdeservico. "OrdemDeServico"
+
+-- select * from identidades.pessoas."Tecnicos"
+-- select * from identidades.pessoas."Clientes"
+-- select * from identidades.pessoas."Fornecedores"
+-- select * from identidades.pessoas."Colaboradores"
+
+-- select * from marketplace.propostas."Propostas"
+
+-- select * from financeiro.lancamentos."Lancamentos"
+-- select * from financeiro.public."OrdensDepagamento"
