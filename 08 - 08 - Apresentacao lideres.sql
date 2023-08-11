@@ -241,7 +241,8 @@ SELECT TECNICOPESSOA."TecnicoNome"                                              
        CLIENTEPROPOSTA."ClienteDePropostaId"                                           AS ClienteDeProposta_id,
        CAST(MovimentacoesLancamentoDesinstalacao."MOVDataDePagamento" AS TIMESTAMP(0)) AS Movimentacoes_DataDePagamentoDesinstalacao,
        CAST(MovimentacoesLancamentoInstalacao."MOVDataDePagamento" AS TIMESTAMP(0))    AS Movimentacoes_DataDePagamentoInstalacao,
-       MarInstalacao."TipComentario"                                                   AS Market_ComentarioInstalacao
+       MarInstalacao."TipComentario"                                                   AS Market_ComentarioInstalacao,
+       PESSOAJURIDICA."PessoaJuridica"                                                 AS PJ_PessoaJuridica
 FROM erprastreamento.ordemdeservico."OrdemDeServico" AS OS
          LEFT JOIN erprastreamento.ordemdeservicoagendamentos."Agendamentos" AS Agendamento
                    ON OS."Id" = Agendamento."OS_Id"
@@ -304,4 +305,10 @@ FROM erprastreamento.ordemdeservico."OrdemDeServico" AS OS
                         'SELECT MarProp."Id" AS Propostas_Id, MarProp."Cliente_Id" AS MarPropostasClienteId,Tip."Comentario" as TipComentario FROM marketplace.propostas."Propostas" AS MarProp
                             left join marketplace.propostas."Tipos" as Tip on Tip."Valor"= MarProp."Tipo_Id" ')
                                 AS MarInstalacao ("Propostas_Id" uuid, "MarPropostasClienteId" uuid,"TipComentario" text)
-                                 ON OS."Proposta_Id" = MarInstalacao."Propostas_Id";
+                                 ON OS."Proposta_Id" = MarInstalacao."Propostas_Id"
+         LEFT JOIN dblink('dbname=identidades',
+                       'SELECT Tecnicos."Id",Pessoas."PessoaJuridica" as PJ from identidades.public."Pessoas" as Pessoas
+                             left join identidades.pessoas."Colaboradores" as Colaboradores on Colaboradores."Pessoa_Id" = Pessoas."Id"
+                             left join identidades.pessoas."Tecnicos" as Tecnicos on Tecnicos."TipoPessoa_Id" = Colaboradores."Id"')
+                                AS PESSOAJURIDICA("TecnicoNomeId" uuid, "PessoaJuridica" boolean)
+                                    ON Agendamento."Tecnico_Id" = PESSOAJURIDICA."TecnicoNomeId";
