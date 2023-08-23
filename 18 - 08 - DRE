@@ -351,7 +351,12 @@ WHERE LC.deleted_at is NULL;
 
 SELECT
     PCI."Nome",
-    MV."ValorPago"
+    MV."ValorPago",
+    LC."Descricao" as DescricaoFilho,
+    LP."Descricao" as DescricaoPai,
+    CAST(MV."DataDePagamento" AS TIMESTAMP(0)) as MV_DataDePagamento,
+    CAST(LC."Vencimento" AS TIMESTAMP(0))  as lc_Vencimento,
+    CAST(LP."Vencimento" AS TIMESTAMP(0))  as lp_Vencimento
 FROM
     financeiro.lancamentos."Lancamentos" AS LC
     LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
@@ -371,7 +376,12 @@ WHERE
 
 SELECT
     PCI."Nome",
-    MV."ValorPago"
+    MV."ValorPago",
+    LC."Descricao" as DescricaoFilho,
+    LP."Descricao" as DescricaoPai,
+    MV."DataDePagamento" as MV_DataDePagamento,
+    LC."Vencimento" as lc_Vencimento,
+    LP."Vencimento" as lp_Vencimento
 FROM
     financeiro.lancamentos."Lancamentos" AS LC
     LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
@@ -390,7 +400,12 @@ WHERE
 UNION ALL
 SELECT
     PCI."Nome",
-    MV."ValorPago"
+    MV."ValorPago",
+    LC."Descricao" as DescricaoFilho,
+    LP."Descricao" as DescricaoPai,
+    MV."DataDePagamento" as MV_DataDePagamento,
+    LC."Vencimento" as lc_Vencimento,
+    LP."Vencimento" as lp_Vencimento
 FROM
     financeiro.lancamentos."Lancamentos" AS LC
     LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
