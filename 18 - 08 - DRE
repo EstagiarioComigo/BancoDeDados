@@ -221,96 +221,6 @@ group by PCI."Nome";
 
 -- MINHA VEZ
 
-SELECT LC."Id"                               AS Lanc_Id,
-       CAST(LC.created_at AS TIMESTAMP(0))   AS Lanc_Created_At,
-       CAST(LC.updated_at AS TIMESTAMP(0))   AS Lanc_Updated_At,
-       CAST(LC.deleted_at AS TIMESTAMP(0))   AS Lanc_Deleted_At,
-       LC."Descricao"                        AS Lanc_Descricao,
-       CAST(LC."Vencimento" AS TIMESTAMP(0)) AS Lanc_Vencimento,
-       LC."Valor"                            AS Lanc_Valor,
-       LC."Cliente_Id"                       AS Lanc_Cliente_Id,
-       LC."Fornecedor_Id"                    AS Lanc_Fornecedor_Id,
-       LC."ContaBancaria_Id"                 AS Lanc_ContaBancaria_Id,
-       LC."DataDeCompetencia"                AS Lanc_DataDeCompetencia,
-       LC."Fatura_Id"                        AS Lanc_Fatura_Id,
-       LC."Boleto_Id"                        AS Lanc_Boleto_Id,
-       LC."NFCE_Id"                          AS Lanc_NFCE_Id,
-       LC."NFS_Id"                           AS Lanc_NFS_Id,
-       LC."NumeroReciboPrestador"            AS Lanc_NumeroReciboPrestador,
-       LC."TipoDePagamento_Id"               AS Lanc_TipoDePagamento_Id,
-       LC."TipoDoLancamento_Id"              AS Lanc_TipoDoLancamento_Id,
-       LC."FormaDePagamento_Id"              AS Lanc_FormaDePagamento_Id,
-       LC."Colaborador_Id"                   AS Lanc_Colaborador_Id,
-       LC."Pago"                             AS Lanc_Pago,
-       LC."PlanoDeContaItem_Id"              AS Lanc_PlanoDeContaItem_Id,
-       LC."CentroDeCustoItem_Id"             AS Lanc_CentroDeCustoItem_Id,
-       LC."Lancamento_Id"                    AS Lanc_Lancamento_Id,
-       LC."Recibo"                           AS Lanc_Recibo,
-       LC."Nota"                             AS Lanc_Nota,
-       LC."CupomFiscal"                      AS Lanc_CupomFiscal,
-       LC."ModalidadeDoLancamento_Id"        AS Lanc_ModalidadeDoLancamento_Id,
-       LC."IntervaloDeRecorrencia"           AS Lanc_IntervaloDeRecorrencia,
-       LC."RecorrenciaEncerrada"             AS Lanc_RecorrenciaEncerrada,
-       LC."Observacoes"                      AS Lanc_Observacoes,
-       LC."ContaDeOrigem_Id"                 AS Lanc_ContaDeOrigem_Id,
-       LC."ContaDeDestino_Id"                AS Lanc_ContaDeDestino_Id,
-       LC."Franquia_Id"                      AS Lanc_Franquia_Id,
-       LC."OrdemDePagamento_Id"              AS Lanc_OrdemDePagamento_Id,
-       LC."NotaFiscalDeServico"              AS Lanc_NotaFiscalDeServico,
-       LC."FaturaDeLocacao"                  AS Lanc_FaturaDeLocacao,
-       LC."CodigoReferencia"                 AS Lanc_CodigoReferencia,
-       LC."MotivoApagado"                    AS Lanc_MotivoApagado,
-       LC."SplitPai_Id"                      AS Lanc_SplitPai_Id,
-       LC."NaoCobrarTaxas"                   AS Lanc_NaoCobrarTaxas,
-       MV."Id"                               AS MV_Id,
-       CAST(MV.created_at AS TIMESTAMP(0))   AS MV_Created_At,
-       CAST(MV.updated_at AS TIMESTAMP(0))   AS MV_Updated_At,
-       CAST(MV.deleted_at AS TIMESTAMP(0))   AS MV_Deleted_At,
-       MV."Lancamento_Id"                    AS MV_Lancamento_Id,
-       MV."JurosAplicado"                    AS MV_JurosAplicado,
-       MV."ValorPago"                        AS MV_ValorPago,
-       MV."DataDePagamento"                  AS MV_DataDePagamento,
-       MV."Multa"                            AS MV_Multa,
-       MV."Desconto"                         AS MV_Desconto,
-       MV."ValorHonorario"                   AS MV_ValorHonorario,
-       PCI."Id"                              AS PCI_Id,
-       CAST(PCI.created_at AS TIMESTAMP(0))  AS PCI_Created_At,
-       CAST(PCI.updated_at AS TIMESTAMP(0))  AS PCI_Updated_At,
-       CAST(PCI.deleted_at AS TIMESTAMP(0))  AS PCI_Deleted_At,
-       PCI."Nome"                            AS PCI_Nome,
-       PCI."PlanoDeContas_Id"                AS PCI_PlanoDeContas_Id,
-       PCI."Pai_Id"                          AS PCI_Pai_Id,
-       PCI."Classificacao"                   AS PCI_Classificacao,
-       PC."Id"                               AS PC_Id,
-       CAST(PC.created_at AS TIMESTAMP(0))   AS PC_Created_At,
-       CAST(PC.updated_at AS TIMESTAMP(0))   AS PC_Updated_At,
-       CAST(PC.deleted_at AS TIMESTAMP(0))   AS PC_Deleted_At,
-       PC."Nome"                             AS PC_Nome,
-       PC."Descricao"                        AS PC_Descricao,
-       PC."Franquia_Id"                      AS PC_Franquia_Id,
-       FRANQUIA."EmpresaId"                  AS Fran_Pessoa_Id,
-       FRANQUIA."PessoaNome"                 AS Fran_Pessoa_Nome,
-       FRANQUIA.Empresa                      AS Fran_Empresa
-FROM financeiro.lancamentos."Lancamentos" as LC
-         left join financeiro.public."Movimentacoes" as MV on MV."Lancamento_Id" = LC."Id"
-         LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
-         LEFT JOIN financeiro.public."PlanoDeContas" as PC ON PCI."PlanoDeContas_Id" = PC."Id"
-         LEFT JOIN dblink('dbname=identidades',
-                          'SELECT Empresas."Id",Pessoas."Nome",Empresas.url from identidades.public."Pessoas" as Pessoas
-                              left join identidades.franquias."Empresas" as Empresas on Empresas."Pessoa_Id" = Pessoas."Id"')
-    AS FRANQUIA("EmpresaId" uuid, "PessoaNome" text, Empresa text)
-                   ON LC."Franquia_Id" = FRANQUIA."EmpresaId"
-WHERE LC.deleted_at is NULL
-  AND LC."Pago" = true
-  AND (
-        (LC."Lancamento_Id" IS NOT NULL AND LC."ModalidadeDoLancamento_Id" = 'recorrente')
-        OR
-        (LC."Lancamento_Id" IS NULL AND
-         (LC."ModalidadeDoLancamento_Id" <> 'recorrente' AND LC."TipoDoLancamento_Id" <> 'transferencia')
-            )
-    );
-
--- Correção do dia 22/08
 
 SELECT LC."Id"                               AS Lanc_Id,
        CAST(LC.created_at AS TIMESTAMP(0))   AS Lanc_Created_At,
@@ -434,3 +344,65 @@ FROM financeiro.lancamentos."Lancamentos" as LC
     AS FRANQUIA("EmpresaId" uuid, "PessoaNome" text, Empresa text)
                    ON LC."Franquia_Id" = FRANQUIA."EmpresaId"
 WHERE LC.deleted_at is NULL;
+
+
+
+-- Juntando 1 e 2 
+
+SELECT
+    PCI."Nome",
+    MV."ValorPago"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON (LP."PlanoDeContaItem_Id" = PCI."Id" OR LC."PlanoDeContaItem_Id" = PCI."Id")
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."Vencimento" >= ('2023-06-01'::timestamptz) AND LC."Vencimento" <= ('2023-06-30'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'despesa'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND ((LC."Lancamento_Id" IS NOT NULL AND LC."ModalidadeDoLancamento_Id" = 'recorrente')
+         OR (LC."Lancamento_Id" IS NULL AND (LC."ModalidadeDoLancamento_Id" <> 'recorrente' AND LC."TipoDoLancamento_Id" <> 'transferencia')));
+
+-- Juntando 3 e 4
+
+SELECT
+    PCI."Nome",
+    MV."ValorPago"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."Vencimento" >= ('2023-06-01'::timestamptz) AND LC."Vencimento" <= ('2023-06-30'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND LC."Lancamento_Id" IS NOT NULL
+    AND LC."ModalidadeDoLancamento_Id" = 'recorrente'
+
+UNION ALL
+SELECT
+    PCI."Nome",
+    MV."ValorPago"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."Vencimento" >= ('2023-06-01'::timestamptz) AND LC."Vencimento" <= ('2023-06-30'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND LC."Lancamento_Id" IS NULL
+    AND LC."ModalidadeDoLancamento_Id" <> 'recorrente'
+    AND LC."TipoDoLancamento_Id" <> 'transferencia';
