@@ -218,6 +218,422 @@ WHERE
 group by PCI."Nome";
 
 
+-- Gilvan mandou no dia 28/08
+
+
+-- Id Franqui / Id Pessoa / Url
+-- 4eb453af-1270-48da-bf78-374a8131b5e9 5f61f680-4c0c-4e47-aa29-5ecdda434521 https://currais.semprecomigo.com
+-- 6f47b439-d725-4508-b47c-728f0dce2166 b9d5e8c7-2cc3-44c4-a366-03fe89f9177d https://maxline.semprecomigo.com
+-- 70791887-a5c9-41ec-9dd1-fd56c5eb2f81 6baaf1ad-086e-4678-ad9e-ef0f21c4a62d https://assistencia.semprecomigo.com
+-- c07e66d4-e4c2-4444-a047-e2952adcf663 79a3a873-9457-43de-9abc-469b6af80156 https://rastreamento.semprecomigo.com
+-- 263d16c7-4dde-4a2d-a72d-d82870f0adbc 519bb4ad-4fa4-45ed-8227-64a64572c5b3 https://marketplace.semprecomigo.com
+
+
+-----------------------------------------------------------------------------------------
+-- Abril
+
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON (LP."PlanoDeContaItem_Id" = PCI."Id" OR LC."PlanoDeContaItem_Id" = PCI."Id")
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-03-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-05-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'despesa'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND ((LC."Lancamento_Id" IS NOT NULL AND LC."ModalidadeDoLancamento_Id" = 'recorrente')
+         OR (LC."Lancamento_Id" IS NULL AND (LC."ModalidadeDoLancamento_Id" <> 'recorrente' AND LC."TipoDoLancamento_Id" <> 'transferencia')))
+group by PCI."Nome";
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-03-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-05-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND LC."Lancamento_Id" IS NOT NULL
+    AND LC."ModalidadeDoLancamento_Id" = 'recorrente'
+group by PCI."Nome"
+
+UNION ALL
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-03-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-05-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND LC."Lancamento_Id" IS NULL
+    AND LC."ModalidadeDoLancamento_Id" <> 'recorrente'
+    AND LC."TipoDoLancamento_Id" <> 'transferencia'
+group by PCI."Nome";
+
+
+-----------------------------------------------------------------------------------------
+-- Maio
+
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON (LP."PlanoDeContaItem_Id" = PCI."Id" OR LC."PlanoDeContaItem_Id" = PCI."Id")
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-04-30'::timestamptz) AND LC."DataDeCompetencia" < ('2023-06-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'despesa'
+    AND LC.deleted_at IS NULL
+    AND ((LC."Lancamento_Id" IS NOT NULL AND LC."ModalidadeDoLancamento_Id" = 'recorrente')
+         OR (LC."Lancamento_Id" IS NULL AND (LC."ModalidadeDoLancamento_Id" <> 'recorrente' AND LC."TipoDoLancamento_Id" <> 'transferencia')))
+group by PCI."Nome";
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-04-30'::timestamptz) AND LC."DataDeCompetencia" < ('2023-06-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Lancamento_Id" IS NOT NULL
+    AND LC."ModalidadeDoLancamento_Id" = 'recorrente'
+--     AND (MV."DataDePagamento" > LC."Vencimento" AND MV."DataDePagamento" >= ('2023-05-25'::timestamptz))
+--     AND MV."DataDePagamento" > LC."Vencimento"
+--     AND MV."DataDePagamento" > (LC."Vencimento" + INTERVAL '5 DAY')
+group by PCI."Nome"
+
+UNION ALL
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-04-30'::timestamptz) AND LC."DataDeCompetencia" < ('2023-06-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Lancamento_Id" IS NULL
+    AND LC."ModalidadeDoLancamento_Id" <> 'recorrente'
+    AND LC."TipoDoLancamento_Id" <> 'transferencia'
+--     AND (MV."DataDePagamento" > LC."Vencimento" AND MV."DataDePagamento" >= ('2023-05-25'::timestamptz))
+--     AND MV."DataDePagamento" > LC."Vencimento"
+--     AND MV."DataDePagamento" > (LC."Vencimento" + INTERVAL '5 DAY')
+group by PCI."Nome";
+
+
+-----------------------------------------------------------------------------------------
+-- Junho
+
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON (LP."PlanoDeContaItem_Id" = PCI."Id" OR LC."PlanoDeContaItem_Id" = PCI."Id")
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-05-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-07-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'despesa'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND ((LC."Lancamento_Id" IS NOT NULL AND LC."ModalidadeDoLancamento_Id" = 'recorrente')
+         OR (LC."Lancamento_Id" IS NULL AND (LC."ModalidadeDoLancamento_Id" <> 'recorrente' AND LC."TipoDoLancamento_Id" <> 'transferencia')))
+group by PCI."Nome";
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-05-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-07-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Lancamento_Id" IS NOT NULL
+    AND LC."ModalidadeDoLancamento_Id" = 'recorrente'
+--     AND (MV."DataDePagamento" > LC."Vencimento" AND MV."DataDePagamento" >= ('2023-06-25'::timestamptz))
+group by PCI."Nome"
+
+UNION ALL
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-05-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-07-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Lancamento_Id" IS NULL
+    AND LC."ModalidadeDoLancamento_Id" <> 'recorrente'
+    AND LC."TipoDoLancamento_Id" <> 'transferencia'
+--     AND (MV."DataDePagamento" > LC."Vencimento" AND MV."DataDePagamento" >= ('2023-06-25'::timestamptz))
+group by PCI."Nome";
+
+
+-----------------------------------------------------------------------------------------
+-- Julho
+
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON (LP."PlanoDeContaItem_Id" = PCI."Id" OR LC."PlanoDeContaItem_Id" = PCI."Id")
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-06-30'::timestamptz) AND LC."DataDeCompetencia" < ('2023-08-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'despesa'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND ((LC."Lancamento_Id" IS NOT NULL AND LC."ModalidadeDoLancamento_Id" = 'recorrente')
+         OR (LC."Lancamento_Id" IS NULL AND (LC."ModalidadeDoLancamento_Id" <> 'recorrente' AND LC."TipoDoLancamento_Id" <> 'transferencia')))
+group by PCI."Nome";
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-06-30'::timestamptz) AND LC."DataDeCompetencia" < ('2023-08-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Lancamento_Id" IS NOT NULL
+    AND LC."ModalidadeDoLancamento_Id" = 'recorrente'
+--     AND (MV."DataDePagamento" > LC."Vencimento" AND MV."DataDePagamento" >= ('2023-07-25'::timestamptz))
+group by PCI."Nome"
+
+UNION ALL
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-06-30'::timestamptz) AND LC."DataDeCompetencia" < ('2023-08-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Lancamento_Id" IS NULL
+    AND LC."ModalidadeDoLancamento_Id" <> 'recorrente'
+    AND LC."TipoDoLancamento_Id" <> 'transferencia'
+--     AND (MV."DataDePagamento" > LC."Vencimento" AND MV."DataDePagamento" >= ('2023-07-25'::timestamptz))
+group by PCI."Nome";
+
+
+-----------------------------------------------------------------------------------------
+-- Agosto
+
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",,
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON (LP."PlanoDeContaItem_Id" = PCI."Id" OR LC."PlanoDeContaItem_Id" = PCI."Id")
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-07-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-09-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'despesa'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND ((LC."Lancamento_Id" IS NOT NULL AND LC."ModalidadeDoLancamento_Id" = 'recorrente')
+         OR (LC."Lancamento_Id" IS NULL AND (LC."ModalidadeDoLancamento_Id" <> 'recorrente' AND LC."TipoDoLancamento_Id" <> 'transferencia')))
+group by PCI."Nome";
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-07-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-09-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND LC."Lancamento_Id" IS NOT NULL
+    AND LC."ModalidadeDoLancamento_Id" = 'recorrente'
+group by PCI."Nome"
+
+UNION ALL
+
+SELECT
+    PCI."Nome",
+    (sum(LC."Valor")/100) as "Valor Total",
+    (sum(MV."ValorPago")/100) as "Valor Pago",
+    (sum(MV."JurosAplicado")/100) as "Juros",
+    (sum(MV."Multa")/100) as "Multa",
+    (sum(MV."ValorHonorario")/100) as "Honorários",
+    (sum(MV."Desconto")/100) as "Desconto"
+FROM
+    financeiro.lancamentos."Lancamentos" AS LC
+    LEFT JOIN financeiro.lancamentos."Lancamentos" AS LP ON LC."Lancamento_Id" = LP."Id"
+    LEFT JOIN financeiro.public."Movimentacoes" AS MV ON MV."Lancamento_Id" = LC."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas_Itens" AS PCI ON LC."PlanoDeContaItem_Id" = PCI."Id"
+    LEFT JOIN financeiro.public."PlanoDeContas" AS PC ON PCI."PlanoDeContas_Id" = PC."Id"
+WHERE
+    LC."Franquia_Id" = 'c07e66d4-e4c2-4444-a047-e2952adcf663'
+    AND (LC."DataDeCompetencia" > ('2023-07-31'::timestamptz) AND LC."DataDeCompetencia" < ('2023-09-01'::timestamptz))
+    AND LC."TipoDoLancamento_Id" = 'receita'
+    AND LC.deleted_at IS NULL
+    AND LC."Pago" = TRUE
+    AND LC."Lancamento_Id" IS NULL
+    AND LC."ModalidadeDoLancamento_Id" <> 'recorrente'
+    AND LC."TipoDoLancamento_Id" <> 'transferencia'
+group by PCI."Nome";
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
 
 -- MINHA VEZ
 
