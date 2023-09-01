@@ -6,8 +6,8 @@ conexao = psycopg2.connect(database = 'financeiro',
                            password = "postgrespassword",
                            port = "5401")
 
-print(conexao.info)
-print(conexao.status)
+# print(conexao.info)
+# print(conexao.status)
 
 cursor = conexao.cursor()
 cursor.execute('SELECT * FROM financeiro.lancamentos."Lancamentos" as LC;')
@@ -23,12 +23,8 @@ for linha in resultado:
     cursor.execute(consulta_sql)
     movimentacoes = cursor.fetchall()
 
-    if movimentacoes:  # Verifica se há movimentações para o lançamento
-        print(f"Movimentações do lançamento {lancamento_id}:")
-        for movimentacao in movimentacoes:
-            print(movimentacao)
-    else:
-        print(f"Nenhuma movimentação para o lançamento {lancamento_id}")
+    if len(movimentacoes)>1:  # Verifica se há movimentações para o lançamento
+        print(f"Multiplas Movimentações do lançamento: {lancamento_id}")
 
 cursor.close()
 conexao.close()
